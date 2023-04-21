@@ -98,7 +98,6 @@ class UserFollowSerializer(serializers.ModelSerializer):
 
     def get_recipes(self, author):
         request = self.context['request']
-        limit = request.GET.get('recipes_limit', 6)
         recipes = author.recipes.all()[:int(limit)]
         serializer = RecipeShortSerializer(recipes, many=True, read_only=True)
         return serializer.data
@@ -170,6 +169,8 @@ class RecipeWriteSerializer(RecipeReadSerializer):
         request = self.context.get('request')
         ingredients = self.initial_data.get('ingredients')
         ingredients = [ingredient['id'] for ingredient in ingredients]
+        amount = ingredients['amount']
+        cooking_time = Recipe[cooking_time]
         if len(ingredients) != len(set(ingredients)):
             raise serializers.ValidationError(
                 'Ингредиенты должны быть в одном экземпляре'
@@ -181,7 +182,17 @@ class RecipeWriteSerializer(RecipeReadSerializer):
             raise serializers.ValidationError(
                 'У вас уже есть рецепт с таким названием'
             )
+        if int(amount) <= 0:
+            raise serializers.ValidationError(
+                'Вес ингредиента не может быть меньше или равен нулю'
+            )
+        if int[cooking_time] <= 0:
+            raise serializers.ValidationError(
+                'Время приготовления не может быть меньше или равен нулю'
+            )
         return data
+        
+         
 
     def create_ingredients(self, ingredients, recipe):
         IngredientAmount.objects.bulk_create([IngredientAmount(
@@ -275,8 +286,10 @@ class FollowSerializer(FavoriteSerializer):
             ),
         )
 
-    def validate(self, data):
-        if data['author'] == data['user']:
+
+    def validate_user(self, data):
+        user = self.context['request'].user
+        if data['author'] == user:
             raise serializers.ValidationError(
                 'Вы не можете подписаться на самого себя'
             )

@@ -49,7 +49,7 @@ class Follow(models.Model):
         related_name='following'
     )
 
-    def validate_follow(self):
+    def validate_user(self):
         if self.user == self.author:
             raise ValidationError('Подписываться на самого себя нельзя.')
     
