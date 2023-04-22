@@ -10,6 +10,7 @@ from recipes.models import (
     ShoppingCart, Tag
 )
 from users.models import Follow
+from .pagination import CustomPagination
 
 User = get_user_model()
 
@@ -93,12 +94,15 @@ class UserFollowSerializer(serializers.ModelSerializer):
         return author.recipes.count()
 
     def get_is_subscribed(self, author):
+        request = self.context.get('request')
         current_user = self.context['request'].user
+        if request.user.is_anonymos:
+            return False
         return current_user.follower.filter(author=author).exists()
 
     def get_recipes(self, author):
         request = self.context['request']
-        recipes = author.recipes.all()[:int(limit)]
+        recipes = author.recipes.all()[:int(CustomPagination)]
         serializer = RecipeShortSerializer(recipes, many=True, read_only=True)
         return serializer.data
 
@@ -186,7 +190,7 @@ class RecipeWriteSerializer(RecipeReadSerializer):
             raise serializers.ValidationError(
                 'Вес ингредиента не может быть меньше или равен нулю'
             )
-        if int[cooking_time] <= 0:
+        if int(cooking_time) <= 0:
             raise serializers.ValidationError(
                 'Время приготовления не может быть меньше или равен нулю'
             )
@@ -293,7 +297,6 @@ class FollowSerializer(FavoriteSerializer):
             raise serializers.ValidationError(
                 'Вы не можете подписаться на самого себя'
             )
-        return data
 
     def to_representation(self, instance):
         return UserFollowSerializer(

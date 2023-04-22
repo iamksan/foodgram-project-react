@@ -79,11 +79,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 Recipe.objects.add_favorite_cart(self.request.user)
                 .prefetch_related('tags', 'author', 'ingredients')
             )
-        else:
-            return (
-                Recipe.objects.
-                prefetch_related('tags', 'author', 'ingredients')
-            )
 
     def get_serializer_class(self):
         if self.action in ('list', 'retrieve'):
