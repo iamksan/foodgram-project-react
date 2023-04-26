@@ -102,7 +102,7 @@ class UserFollowSerializer(serializers.ModelSerializer):
 
     def get_recipes(self, author):
         request = self.context['request']
-        recipes = author.recipes.all()[:int(CustomPagination)]
+        recipes = author.recipes.all()[:int('limit')]
         serializer = RecipeShortSerializer(recipes, many=True, read_only=True)
         return serializer.data
 
