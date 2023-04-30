@@ -7,7 +7,7 @@ from djoser.conf import settings
 from djoser.views import UserViewSet as DjUserViewSet
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from recipes.models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
@@ -72,7 +72,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPageNumberPagination
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
-    permission_classes = (AuthorOrReadOnly )
+    permission_classes = (AuthorOrReadOnly,)
 
     def get_queryset(self):
         if self.request.user.is_authenticated:
@@ -120,7 +120,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(
         methods=['get'],
         detail=False,
-        permission_classes=(IsAuthenticated)
+        permission_classes=(IsAuthenticated,)
     )
     def download_shopping_cart(self, request):
         current_user = request.user
