@@ -17,7 +17,7 @@ from .misc import recipe_m2m_create_delete
 from .pagination import CustomPageNumberPagination
 from .permissions import AuthorOrReadOnly
 from .serializers import (FavoriteSerializer, IngredientSerializer,
-                          RecipeReadSerializer,
+                          RecipeReadSerializer,RecipeShortSerializer,
                           RecipeWriteSerializer, ShoppingCartSerializer,
                           TagSerializer)
 
@@ -87,9 +87,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
             )
 
     def get_serializer_class(self):
-        if self.action in ('retrieve'):
+        if self.request.user.is_anonymous:
+            return RecipeShortSerializer
+        elif self.action in ('retrieve'):
             return RecipeReadSerializer
-        return RecipeWriteSerializer
+        else:
+            return RecipeWriteSerializer
 
     @action(
         methods=['post', 'delete'],

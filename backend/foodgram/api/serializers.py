@@ -57,6 +57,7 @@ class RecipeShortSerializer(serializers.ModelSerializer):
             'name',
             'image',
             'cooking_time',
+            'author',
         )
         read_only_fields = ('__all__',)
 
